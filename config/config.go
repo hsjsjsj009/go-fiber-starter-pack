@@ -3,6 +3,7 @@ package config
 import (
 	"database/sql"
 	"github.com/hsjsjsj009/go-beans"
+	log "github.com/sirupsen/logrus"
 	"go-fiber-starter-pack/db"
 	"go-fiber-starter-pack/package/env"
 	"go-fiber-starter-pack/package/jwe"
@@ -35,11 +36,19 @@ func LoadDependenciesAndConfig() (res *beans.ProviderContainer,envConfig *env.Da
 		DBMaxLifeTimeConnection: str.StringToInt(envConfig.EnvMap["DATABASE_MAX_LIFETIME_CONNECTION"]),
 	}
 
-	res.AddProviderSingleton(func() (db.SQLDb,error,beans.CleanUpFunc) {
-		dbPsql,err := dbConn.Connect()
-		return dbPsql,err, func() {
+	dbPsql,err := dbConn.Connect()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	res.AddProviderSingleton(func() (db.SQLDb,beans.CleanUpFunc) {
+		return dbPsql, func() {
 			dbPsql.Close()
 		}
+	})
+
+	res.AddProvider(func() (db.SQLTx,error) {
+		return dbPsql.Begin()
 	})
 
 	//res.AddProviderSingleton(func() jwe.Credential {
