@@ -13,7 +13,7 @@ type ExampleHandler struct {
 
 func(h *ExampleHandler) Example(ctx *fiber.Ctx) error {
 	var (
-		DB db.SQLDb
+		Tx db.SQLTx
 	)
 
 	uc := usecases.NewExampleUC()
@@ -22,16 +22,19 @@ func(h *ExampleHandler) Example(ctx *fiber.Ctx) error {
 		return h.SendErrorResponse(ctx,err.Error(),http.StatusBadRequest)
 	}
 
-	err = h.DepContainer.InjectVariable(&DB)
+	err = h.DepContainer.InjectVariable(&Tx)
 	if err != nil {
 		return h.SendErrorResponse(ctx,err.Error(),http.StatusInternalServerError)
 	}
 
+	uc.BeginTx(Tx)
+
 	data,err := uc.ExampleCase()
 	if err != nil {
+		Tx.Rollback()
 		return h.SendErrorResponse(ctx,err.Error(),http.StatusBadRequest)
 	}
 
-
+	Tx.Commit()
 	return h.SendSuccessResponse(ctx,data,nil)
 }
