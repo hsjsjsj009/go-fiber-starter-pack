@@ -10,6 +10,7 @@ import (
 	"go-fiber-starter-pack/package/jwt"
 	"go-fiber-starter-pack/package/postgresql"
 	"go-fiber-starter-pack/package/str"
+	"time"
 )
 
 type Configs struct {
@@ -24,6 +25,13 @@ func LoadDependenciesAndConfig() (res *beans.ProviderContainer,envConfig *env.Da
 	res = beans.NewContainer()
 	envConfig = env.LoadAllEnv("./.env")
 
+	locZone := envConfig.GetWithDefault("TIME_ZONE","Asia/Jakarta")
+	loc,err := time.LoadLocation(locZone)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	time.Local = loc
+
 	dbConn := postgresql.Connection{
 		Host:                    envConfig.EnvMap["DATABASE_HOST"],
 		DbName:                  envConfig.EnvMap["DATABASE_DB"],
@@ -33,7 +41,9 @@ func LoadDependenciesAndConfig() (res *beans.ProviderContainer,envConfig *env.Da
 		SslMode:                 envConfig.EnvMap["DATABASE_SSL_MODE"],
 		DBMaxConnection:         str.StringToInt(envConfig.EnvMap["DATABASE_MAX_CONNECTION"]),
 		DBMAxIdleConnection:     str.StringToInt(envConfig.EnvMap["DATABASE_MAX_IDLE_CONNECTION"]),
+		Location: 				 loc,
 		DBMaxLifeTimeConnection: str.StringToInt(envConfig.EnvMap["DATABASE_MAX_LIFETIME_CONNECTION"]),
+
 	}
 
 	dbPsql,err := dbConn.Connect()

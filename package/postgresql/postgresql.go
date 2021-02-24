@@ -39,9 +39,13 @@ func (c Connection) Connect() (*sql.DB, error) {
 	}
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
+	if errPing := db.Ping(); errPing != nil {
+		db.Close()
+		return nil, errPing
+	}
+
 	db.SetMaxOpenConns(c.DBMaxConnection)
 	db.SetMaxIdleConns(c.DBMAxIdleConnection)
 	db.SetConnMaxLifetime(time.Duration(c.DBMaxLifeTimeConnection) * time.Second)
