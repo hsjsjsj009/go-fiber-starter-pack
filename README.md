@@ -9,3 +9,8 @@
 7. [jwx](https://github.com/lestrrat/go-jwx)
 8. [jwt](https://github.com/dgrijalva/jwt-go)
 9. and many more
+
+## Create a Docker Image
+```shell
+docker build -t=<your-image-name> -f ./server/Dockerfile .
+```
