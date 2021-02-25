@@ -1,5 +1,6 @@
 # GO FIBER STARTER PACK
 ## Dependency
+Default DB : postgresql
 1. [Go Fiber](https://github.com/gofiber/fiber)
 2. [Go Playground Validator v10](https://github.com/go-playground/validator)
 3. [Go Beans](https://github.com/hsjsjsj009/go-beans)
@@ -10,7 +11,25 @@
 8. [jwt](https://github.com/dgrijalva/jwt-go)
 9. and many more
 
-## Create a Docker Image
+## How to Run the Server
+### Prerequisites
+1. Run the postgresql db using docker-compose.dev.yml
+```shell
+cd server
+make run-container
+```
+### Run Server
+```shell
+cd server
+make run
+```
+### Stop Container
+```shell
+cd server
+make stop-container
+```
+
+## How to Create a Server Docker Image
 ```shell
 docker build -t=<your-image-name> -f ./server/Dockerfile .
 ```
