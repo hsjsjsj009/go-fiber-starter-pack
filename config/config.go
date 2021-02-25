@@ -8,7 +8,7 @@ import (
 	"go-fiber-starter-pack/package/env"
 	"go-fiber-starter-pack/package/jwe"
 	"go-fiber-starter-pack/package/jwt"
-	"go-fiber-starter-pack/package/postgresql"
+	"go-fiber-starter-pack/package/gormpsql"
 	"go-fiber-starter-pack/package/str"
 	"time"
 )
@@ -32,7 +32,7 @@ func LoadDependenciesAndConfig() (res *beans.ProviderContainer,envConfig *env.Da
 	}
 	time.Local = loc
 
-	dbConn := postgresql.Connection{
+	dbConn := gormpsql.Connection{
 		Host:                    envConfig.EnvMap["DATABASE_HOST"],
 		DbName:                  envConfig.EnvMap["DATABASE_DB"],
 		User:                    envConfig.EnvMap["DATABASE_USER"],
@@ -43,7 +43,6 @@ func LoadDependenciesAndConfig() (res *beans.ProviderContainer,envConfig *env.Da
 		DBMAxIdleConnection:     str.StringToInt(envConfig.EnvMap["DATABASE_MAX_IDLE_CONNECTION"]),
 		Location: 				 loc,
 		DBMaxLifeTimeConnection: str.StringToInt(envConfig.EnvMap["DATABASE_MAX_LIFETIME_CONNECTION"]),
-
 	}
 
 	dbPsql,err := dbConn.Connect()

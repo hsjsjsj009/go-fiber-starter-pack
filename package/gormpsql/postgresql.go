@@ -1,4 +1,4 @@
-package postgresql
+package gormpsql
 
 import (
 	"database/sql"
