@@ -1,8 +1,9 @@
 package gormpsql
 
 import (
-	"database/sql"
 	"fmt"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -16,39 +17,28 @@ type Connection struct {
 	Password                string
 	Port                    int
 	Location                *time.Location
-	SslMode                 string
-	SslCert                 string
-	SslKey                  string
-	SslRootCert             string
 	DBMaxConnection         int
 	DBMAxIdleConnection     int
 	DBMaxLifeTimeConnection int
 }
 
 // Connect ...
-func (c Connection) Connect() (*sql.DB, error) {
-	connStr := fmt.Sprintf(
-		"postgres://%s:%s@%s:%d/%s?sslmode=%s&TimeZone=UTC", c.User, c.Password, c.Host, c.Port, c.DbName, c.SslMode,
-	)
-
-	if c.SslMode == "require" {
-		connStr = fmt.Sprintf(
-			"postgres://%s:%s@%s:%d/%s?sslmode=%s&TimeZone=UTC&sslcert=%s&sslkey=%s&sslrootcert=%s",
-			c.User, c.Password, c.Host, c.Port, c.DbName, c.SslMode, c.SslCert, c.SslKey, c.SslRootCert,
-		)
-	}
-	db, err := sql.Open("postgres", connStr)
+func (c Connection) Connect() (*gorm.DB, error) {
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=%s",
+		c.Host,c.User,c.Password,c.DbName,c.Port,c.Location.String())
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
-	if errPing := db.Ping(); errPing != nil {
-		db.Close()
-		return nil, errPing
+
+	dbSql,err := db.DB()
+	if err != nil {
+		return nil, err
 	}
 
-	db.SetMaxOpenConns(c.DBMaxConnection)
-	db.SetMaxIdleConns(c.DBMAxIdleConnection)
-	db.SetConnMaxLifetime(time.Duration(c.DBMaxLifeTimeConnection) * time.Second)
+	dbSql.SetMaxOpenConns(c.DBMaxConnection)
+	dbSql.SetMaxIdleConns(c.DBMAxIdleConnection)
+	dbSql.SetConnMaxLifetime(time.Duration(c.DBMaxLifeTimeConnection) * time.Second)
 
 	return db, err
 }

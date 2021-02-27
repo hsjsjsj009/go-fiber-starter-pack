@@ -1,4 +1,4 @@
-# GO FIBER STARTER PACK
+# GO FIBER STARTER PACK (USING GORM)
 ## Dependency
 Default DB : postgresql
 1. [Go Fiber](https://github.com/gofiber/fiber)
@@ -9,7 +9,8 @@ Default DB : postgresql
 6. [go-playground universal translator](https://github.com/go-playground/universal-translator)
 7. [jwx](https://github.com/lestrrat/go-jwx)
 8. [jwt](https://github.com/dgrijalva/jwt-go)
-9. and many more
+9. [gorm](https://gorm.io)
+10. and many more
 
 ## How to Run the Server
 ### Prerequisites

@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"go-fiber-starter-pack/db"
 	"go-fiber-starter-pack/usecases"
+	"gorm.io/gorm"
 	"net/http"
 )
 
@@ -13,7 +13,7 @@ type ExampleHandler struct {
 
 func(h *ExampleHandler) Example(ctx *fiber.Ctx) error {
 	var (
-		Tx db.SQLTx
+		tx *gorm.DB
 	)
 
 	uc := usecases.NewExampleUC()
@@ -22,19 +22,21 @@ func(h *ExampleHandler) Example(ctx *fiber.Ctx) error {
 		return h.SendErrorResponse(ctx,err.Error(),http.StatusBadRequest)
 	}
 
-	err = h.DepContainer.InjectVariable(&Tx)
+	err = h.DepContainer.InjectVariable(&tx)
 	if err != nil {
 		return h.SendErrorResponse(ctx,err.Error(),http.StatusInternalServerError)
 	}
 
-	uc.BeginTx(Tx)
+	tx = tx.Begin()
+
+	uc.BeginTx(tx)
 
 	data,err := uc.ExampleCase()
 	if err != nil {
-		Tx.Rollback()
+		tx.Rollback()
 		return h.SendErrorResponse(ctx,err.Error(),http.StatusBadRequest)
 	}
 
-	Tx.Commit()
+	tx.Commit()
 	return h.SendSuccessResponse(ctx,data,nil)
 }

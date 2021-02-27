@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"go-fiber-starter-pack/db"
 	"go-fiber-starter-pack/db/repository/model"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -16,7 +16,7 @@ type exampleImplementation struct {
 	dbInstance
 }
 
-func NewExampleRepo(db db.SQLDb) ExampleRepo {
+func NewExampleRepo(db *gorm.DB) ExampleRepo {
 	return &exampleImplementation{
 		dbInstance{db: db},
 	}

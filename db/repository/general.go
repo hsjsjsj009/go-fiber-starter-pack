@@ -1,32 +1,30 @@
 package repository
 
 import (
-	"go-fiber-starter-pack/db"
+	"gorm.io/gorm"
 )
 
 type DbInstance interface {
-	RegisterTx(tx db.SQLTx)
-	GetWriteInstance() db.SQLInstance
-	GetReadInstance() db.SQLInstance
+	RegisterTx(tx *gorm.DB)
 }
 
 type dbInstance struct {
-	db db.SQLDb
-	tx db.SQLTx
+	db *gorm.DB
+	tx *gorm.DB
 }
 
-func(g *dbInstance) RegisterTx(tx db.SQLTx) {
+func(g *dbInstance) RegisterTx(tx *gorm.DB) {
 	g.tx = tx
 }
 
-func(g *dbInstance) GetWriteInstance() db.SQLInstance {
+func(g *dbInstance) GetWriteInstance() *gorm.DB {
 	if g.tx != nil {
 		return g.tx
 	}
 	return g.db
 }
 
-func(g *dbInstance) GetReadInstance() db.SQLInstance {
+func(g *dbInstance) GetReadInstance() *gorm.DB {
 	return g.db
 }
 

@@ -1,7 +1,7 @@
 package usecases
 
-import "go-fiber-starter-pack/db"
+import "gorm.io/gorm"
 
 type UC interface {
-	BeginTx(db.SQLTx)
+	BeginTx(*gorm.DB)
 }

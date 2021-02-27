@@ -1,11 +1,11 @@
 package usecases
 
 import (
-	"go-fiber-starter-pack/db"
 	"go-fiber-starter-pack/db/repository"
 	"go-fiber-starter-pack/package/functioncaller"
 	"go-fiber-starter-pack/package/logruslogger"
 	"go-fiber-starter-pack/usecases/viewmodel"
+	"gorm.io/gorm"
 )
 
 type ExampleUC interface {
@@ -21,7 +21,7 @@ func NewExampleUC() *exampleUCImpl {
 	return &exampleUCImpl{}
 }
 
-func (e *exampleUCImpl) BeginTx(tx db.SQLTx){
+func (e *exampleUCImpl) BeginTx(tx *gorm.DB){
 	e.ExampleRepo.RegisterTx(tx)
 }
 

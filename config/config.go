@@ -1,24 +1,14 @@
 package config
 
 import (
-	"database/sql"
 	"github.com/hsjsjsj009/go-beans"
 	log "github.com/sirupsen/logrus"
-	"go-fiber-starter-pack/db"
 	"go-fiber-starter-pack/package/env"
-	"go-fiber-starter-pack/package/jwe"
-	"go-fiber-starter-pack/package/jwt"
 	"go-fiber-starter-pack/package/gormpsql"
 	"go-fiber-starter-pack/package/str"
+	"gorm.io/gorm"
 	"time"
 )
-
-type Configs struct {
-	JweCred     *jwe.Credential
-	JwtCred     *jwt.Credential
-	DB          *sql.DB
-	EnvConfig   *env.Data
-}
 
 func LoadDependenciesAndConfig() (res *beans.ProviderContainer,envConfig *env.Data) {
 
@@ -38,7 +28,6 @@ func LoadDependenciesAndConfig() (res *beans.ProviderContainer,envConfig *env.Da
 		User:                    envConfig.EnvMap["DATABASE_USER"],
 		Password:                envConfig.EnvMap["DATABASE_PASSWORD"],
 		Port:                    str.StringToInt(envConfig.EnvMap["DATABASE_PORT"]),
-		SslMode:                 envConfig.EnvMap["DATABASE_SSL_MODE"],
 		DBMaxConnection:         str.StringToInt(envConfig.EnvMap["DATABASE_MAX_CONNECTION"]),
 		DBMAxIdleConnection:     str.StringToInt(envConfig.EnvMap["DATABASE_MAX_IDLE_CONNECTION"]),
 		Location: 				 loc,
@@ -50,14 +39,8 @@ func LoadDependenciesAndConfig() (res *beans.ProviderContainer,envConfig *env.Da
 		log.Fatal(err.Error())
 	}
 
-	res.AddProviderSingleton(func() (db.SQLDb,beans.CleanUpFunc) {
-		return dbPsql, func() {
-			dbPsql.Close()
-		}
-	})
-
-	res.AddProvider(func() (db.SQLTx,error) {
-		return dbPsql.Begin()
+	res.AddProviderSingleton(func() *gorm.DB {
+		return dbPsql
 	})
 
 	//res.AddProviderSingleton(func() jwe.Credential {
